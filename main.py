@@ -7,9 +7,10 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import *
 import songs
-from db_functions import create_database_or_database_table, add_song_to_database_table, \
-    fetch_all_songs_from_database_table, delete_song_from_database_table, delete_all_songs_from_database_table, \
-    get_playlist_tables, delete_database_table
+from db_functions import create_playlist_table, add_song_to_playlist, \
+    fetch_all_songs_from_playlist, delete_song_from_playlist, delete_all_songs_from_playlist, \
+    get_playlist_tables, delete_playlist_table, add_song_to_favourites, delete_song_from_favourites, \
+    delete_all_songs_from_favourites, fetch_all_songs_from_favourites
 from music import Ui_MusicApp
 from PyQt5.QtCore import Qt, QUrl, QTimer
 
@@ -25,6 +26,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
         super().__init__()
         self.window = QMainWindow()
         self.setupUi(self)
+
 
         # Remove default title bar
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -48,7 +50,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
 
         # Database Stuff
         create_db_dir()
-        create_database_or_database_table('favourites')
+        create_playlist_table('favourites')  # Use create_playlist_table
         self.load_favourites_into_app()
         self.load_playlists()
 
@@ -450,7 +452,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
     # FAVOURITE FUNCTIONS
     # Load Favourite songs
     def load_favourites_into_app(self):
-        favourite_songs = fetch_all_songs_from_database_table('favourites')
+        favourite_songs = fetch_all_songs_from_favourites()  # Use the dedicated function
         songs.favourites_songs_list.clear()
         self.favourites_listWidget.clear()
 
@@ -472,7 +474,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
             )
             return
         for song in songs.current_song_list:
-            add_song_to_database_table(song, 'favourites')
+            add_song_to_favourites(song)
         self.load_favourites_into_app()
 
     # Add song to favourites
@@ -486,7 +488,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
             return
         try:
             song = songs.current_song_list[current_index]
-            add_song_to_database_table(song=f"{song}", table='favourites')
+            add_song_to_favourites(song=f"{song}")
             # QMessageBox.information(
             #     self, 'Add Songs to Favourites',
             #     f'{os.path.basename(song)} was successfully added to favourites'
@@ -512,7 +514,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
             return
         try:
             song = songs.favourites_songs_list[current_index]
-            delete_song_from_database_table(song=f'{song}', table='favourites')
+            delete_song_from_favourites(song=f'{song}')
             self.load_favourites_into_app()
         except Exception as e:
             print(f"Removing from favourites error: {e}")
@@ -534,7 +536,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
         if question == QMessageBox.Yes:
             try:
 
-                delete_all_songs_from_database_table(table='favourites')
+                delete_all_songs_from_favourites()
                 self.load_favourites_into_app()
             except Exception as e:
                 print(f"Removing all songs from favourites error: {e}")
@@ -543,7 +545,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
     # Load Playlists into app
     def load_playlists(self):
         playlists = get_playlist_tables()
-        playlists.remove('favourites')
+        #playlists.remove('favourites')
         self.playlists_listWidget.clear()
         for playlist in playlists:
             self.playlists_listWidget.addItem(
@@ -566,7 +568,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
                 return
             else:
                 if name not in existing:
-                    create_database_or_database_table(f'{name}')
+                    create_playlist_table(f'{name}')
                     self.load_playlists()
                 elif name in existing:
                     caution = QMessageBox.question(
@@ -576,8 +578,8 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
                         QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel
                     )
                     if caution == QMessageBox.Yes:
-                        delete_database_table(f'{name}')
-                        create_database_or_database_table(f'{name}')
+                        delete_playlist_table(f'{name}')
+                        create_playlist_table(f'{name}')
                         self.load_playlists()
         except Exception as e:
             print(f"Creating a new playlist error: {e}")
@@ -586,7 +588,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
     def delete_playlist(self):
         playlist = self.playlists_listWidget.currentItem().text()
         try:
-            delete_database_table(playlist)
+            delete_playlist_table(playlist)
         except Exception as e:
             print(f"Deleting playlist error: {e}")
         finally:
@@ -606,7 +608,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
         if caution == QMessageBox.Yes:
             try:
                 for playlist in playlists:
-                    delete_database_table(playlist)
+                    delete_playlist_table(playlist)
             except Exception as e:
                 print(f"Deleting all playlists error: {e}")
             finally:
@@ -631,7 +633,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
         except Exception as e:
             QMessageBox.information(self, 'Unsuccessful', 'No song was selected')
             return
-        add_song_to_database_table(song=song, table=playlist)
+        add_song_to_playlist(song=song, table=playlist)
         self.load_playlists()
 
     # Add all current songs to a playlist
@@ -653,7 +655,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
             )
             return
         for song in songs.current_song_list:
-            add_song_to_database_table(song=song, table=playlist)
+            add_song_to_playlist(song=song, table=playlist)
         self.load_playlists()
 
     # Add currently playing to a playlist
@@ -677,13 +679,13 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
 
         current_media = self.player.media()
         song = current_media.canonicalUrl().path()[1:]
-        add_song_to_database_table(song=song, table=playlist)
+        add_song_to_playlist(song=song, table=playlist)
         self.load_playlists()
 
     # Load playlists songs to current list
     def load_playlist_songs_to_current_list(self, playlist):
         try:
-            playlist_songs = fetch_all_songs_from_database_table(playlist)
+            playlist_songs = fetch_all_songs_from_playlist(playlist)
             if len(playlist_songs) == 0:
                 QMessageBox.information(
                     self, 'Load playlist song',
@@ -705,7 +707,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
     def show_playlist_content(self):
         try:
             playlist = self.playlists_listWidget.currentItem().text()
-            songs = fetch_all_songs_from_database_table(playlist)
+            songs = fetch_all_songs_from_playlist(playlist)
             songs_only = [os.path.basename(song) for song in songs]
             playlist_dialog = PlaylistDialog(songs_only, f'{playlist}')
             playlist_dialog.exec_()

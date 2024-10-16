@@ -1,2 +1,4 @@
-PyQt5==5.15.10
+PyQt5~=5.15.9
 pyqt5-tools==5.15.9.3.3
+
+supabase~=2.9.0

@@ -1,85 +1,120 @@
-import os
-import sqlite3
+from supabase import create_client, Client
 
-database_dir = os.path.join(os.getcwd(), '.dbs')
-app_database = os.path.join(database_dir, 'app_db.db')
+# Configure Supabase
+SUPABASE_URL = "https://mrxbxtuptrdmfgvdbofk.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yeGJ4dHVwdHJkbWZndmRib2ZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg5Mzc1OTQsImV4cCI6MjA0NDUxMzU5NH0.3v1kGzwEdV8CBql4kQ5iW4ep2cUDxdfdcKThEkuP3ew"
 
-
-# Create the database or a database table
-def create_database_or_database_table(table_name: str):
-    connection = sqlite3.connect(app_database)
-    cursor = connection.cursor()
-    cursor.execute(f"""CREATE TABLE IF NOT EXISTS {table_name} (song TEXT)""")
-    connection.commit()
-    connection.close()
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
-# Add a song to a database table
-def add_song_to_database_table(song: str, table: str):
-    connection = sqlite3.connect(app_database)
-    cursor = connection.cursor()
-    cursor.execute(f"""INSERT INTO {table} VALUES (?)""", (song,))
-    connection.commit()
-    connection.close()
+def create_playlist_table(table_name: str):
+    try:
+        response = supabase.rpc("create_playlist_table", {"table_name": table_name}).execute()
+        if response.status_code != 200:
+            print("Error creating table:", response.json())
+            return False
+        return True
+    except Exception as e:
+        print(f"Exception while creating table: {e}")
+        return False
 
 
-# Delete all songs from a database table
-def delete_song_from_database_table(song: str, table: str):
-    connection = sqlite3.connect(app_database)
-    cursor = connection.cursor()
-    cursor.execute(
-        f"""
-        DELETE from {table} WHERE 
-        ROWID = (SELECT min(ROWID) from favourites 
-        WHERE song = "{song}");
-        """
-    )
-    connection.commit()
-    connection.close()
+
+def add_song_to_playlist(song: str, playlist: str):
+    try:
+        response = supabase.table(playlist).insert({"song": song}).execute()
+        if response.status_code != 201:
+            print("Error adding song:", response.json())
+            return False  # Indicate failure
+        return True  # Indicate success
+
+    except Exception as e:
+        print(f"Exception while adding song: {e}")
+        return False  # Indicate failure
 
 
-# Delete all songs from a database table
-def delete_all_songs_from_database_table(table: str):
-    connection = sqlite3.connect(app_database)
-    cursor = connection.cursor()
-    cursor.execute(f"""DELETE FROM {table}""")
-    connection.commit()
-    connection.close()
+
+def delete_song_from_playlist(song: str, playlist: str):
+    try:
+        response = supabase.table(playlist).delete().eq("song", song).execute()
+        if response.status_code != 200:
+            print("Error deleting song:", response.json())
+            return False
+        return True
+    except Exception as e:
+        print(f"Exception while deleting song: {e}")
+        return False
 
 
-# Fetch all songs from a database table
-def fetch_all_songs_from_database_table(table: str):
-    connection = sqlite3.connect(app_database)
-    cursor = connection.cursor()
-    cursor.execute(f"""SELECT song FROM {table}""")
-    song_data = cursor.fetchall()
-    data = [song[0] for song in song_data]
-    connection.commit()
-    connection.close()
+def delete_all_songs_from_playlist(playlist: str):
+    try:
+        response = supabase.table(playlist).delete().neq("song", "").execute() # It might make more sense to delete everything, not check against empty song
+        if response.status_code != 200:
+            print("Error deleting all songs:", response.json())
+            return False
+        return True
+    except Exception as e:
+        print(f"Exception while deleting all songs: {e}")
+        return False
 
-    return data
 
 
-# Get all tables in the database
+def fetch_all_songs_from_playlist(playlist: str):
+    try:
+        response = supabase.table(playlist).select("*").execute()
+        if response.status_code == 200:
+            return [record["song"] for record in response.data]
+        else:
+            print("Error fetching songs:", response.json())
+            return []
+    except Exception as e:
+        print(f"Exception while fetching songs: {e}")
+        return []
+
+
+
 def get_playlist_tables():
     try:
-        connection = sqlite3.connect(app_database)
-        cursor = connection.cursor()
-        cursor.execute("""SELECT * from sqlite_master WHERE type = 'table';""")
-        table_names = cursor.fetchall()
-        tables = [table_name[1] for table_name in table_names]
-
-        return tables
-    except sqlite3.Error as e:
-        print(f"Error getting table names: {e}")
-    finally:
-        connection.close()
+        response = supabase.rpc("get_playlist_tables").execute()
+        if response.status_code == 200:
+            return response.data
+        else:
+            print("Error getting playlist tables:", response.json())
+            return []
+    except Exception as e:
+        print(f"Exception while getting playlist tables: {e}")
+        return []
 
 
-# Delete a database table
-def delete_database_table(table: str):
-    connection = sqlite3.connect(app_database)
-    cursor = connection.cursor()
-    cursor.execute(f"""DROP TABLE {table}""")
-    connection.commit()
-    connection.close()
+def delete_playlist_table(table: str):
+    try:
+        response = supabase.rpc("drop_table", {"table_name": table}).execute()
+        if response.status_code != 200:
+            print("Error deleting table:", response.json())
+            return False  # Indicate failure
+        return True  # Indicate Success
+
+    except Exception as e:
+        print(f"Exception while deleting table: {e}")
+        return False
+
+
+
+def add_song_to_favourites(song: str):
+    return add_song_to_playlist(song, "favourites")
+
+
+
+def delete_song_from_favourites(song: str):
+    return delete_song_from_playlist(song, 'favourites')
+
+def delete_all_songs_from_favourites():
+    return delete_all_songs_from_playlist('favourites')
+
+def fetch_all_songs_from_favourites():
+    return fetch_all_songs_from_playlist("favourites")
+
+
+
+def clear_currently_playing(listWidget): # Helper function - new addition
+    listWidget.clear()

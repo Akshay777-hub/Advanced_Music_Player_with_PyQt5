@@ -64,7 +64,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>utils/bg_imgs/bg_0002_11.jpg</pixmap>
+     <pixmap resource="res.qrc">:/img/wallpaper.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -369,7 +369,7 @@ color: rgb(79, 208, 178);</string>
 color: rgb(255, 255, 255);</string>
      </property>
      <property name="text">
-      <string>Song name goes here</string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="label_7">
@@ -417,7 +417,7 @@ color: rgb(79, 208, 178);</string>
 color: rgb(255, 255, 255);</string>
      </property>
      <property name="text">
-      <string>Song path goes here</string>
+      <string/>
      </property>
     </widget>
     <widget class="QPushButton" name="add_to_fav_btn">
@@ -440,8 +440,14 @@ color: rgb(255, 255, 255);</string>
       <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(255, 140, 64);</string>
+      <string notr="true">QPushButton{
+background-color: rgb(255, 255, 255);
+color: rgb(128, 0, 255);
+}
+QPushButton:pressed{
+background-color: rgb(112, 0, 132);
+color: rgb(255, 255, 255);
+}</string>
      </property>
      <property name="text">
       <string>Add to Favourites</string>
@@ -477,8 +483,13 @@ color: rgb(255, 140, 64);</string>
       <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 140, 64);
-color: rgb(255, 255, 255);</string>
+      <string notr="true">QPushButton{background-color: rgb(100, 0, 240);
+
+}
+QPushButton:pressed{
+background-color: rgb(112, 0, 132);
+color: rgb(255, 255, 255);
+}</string>
      </property>
      <property name="text">
       <string>  Add to Playlist</string>
@@ -575,6 +586,11 @@ border-radius:10px;</string>
 QPushButton:hover{
 	background-color: rgba(255,255,255,100);
 }
+
+QPushButton:pressed{
+background-color: rgb(112, 0, 132);
+color: rgb(255, 255, 255);
+}
 </string>
           </property>
           <property name="text">
@@ -612,7 +628,11 @@ QPushButton:hover{
 QPushButton:hover{
 	background-color: rgba(255,255,255,100);
 }
-</string>
+
+QPushButton:pressed{
+background-color: rgb(112, 0, 132);
+color: rgb(255, 255, 255);
+}</string>
           </property>
           <property name="text">
            <string/>
@@ -648,6 +668,11 @@ QPushButton:hover{
 
 QPushButton:hover{
 	background-color: rgba(255,255,255,100);
+}
+
+QPushButton:pressed{
+background-color: rgb(112, 0, 132);
+color: rgb(255, 255, 255);
 }
 </string>
           </property>
@@ -686,7 +711,11 @@ QPushButton:hover{
 QPushButton:hover{
 	background-color: rgba(255,255,255,100);
 }
-</string>
+
+QPushButton:pressed{
+background-color: rgb(112, 0, 132);
+color: rgb(255, 255, 255);
+}</string>
           </property>
           <property name="text">
            <string/>
@@ -729,7 +758,11 @@ QPushButton:hover{
 QPushButton:hover{
 	background-color: rgba(255,255,255,100);
 }
-</string>
+
+QPushButton:pressed{
+background-color: rgb(112, 0, 132);
+color: rgb(255, 255, 255);
+}</string>
           </property>
           <property name="text">
            <string/>
@@ -781,6 +814,11 @@ QPushButton:hover{
 
 QPushButton:checked{
 	background-color: rgba(255,255,255,100);
+}
+
+QPushButton:pressed{
+background-color: rgb(112, 0, 132);
+color: rgb(255, 255, 255);
 }
 </string>
           </property>
@@ -839,7 +877,11 @@ QPushButton:hover{
 QPushButton:checked{
 	background-color: rgba(255,255,255,100);
 }
-</string>
+
+QPushButton:pressed{
+background-color: rgb(112, 0, 132);
+color: rgb(255, 255, 255);
+}</string>
           </property>
           <property name="text">
            <string/>
@@ -881,13 +923,13 @@ QPushButton:checked{
     border: 1px solid #999999;
     height: 15px; 
    padding:3px;
-	background: rgba(0, 255, 127, 100);
+	background: rgba(100, 0, 240, 100);
     margin: 2px 0;
 	border-radius:11px;
 }
 
 QSlider::handle:horizontal {
-    background:  rgb(255, 200, 50);
+    background:  rgb(255, 250, 250);
     border: 1px solid #5c5c5c;
     width: 18px;
     margin: -2px 0;
@@ -1000,8 +1042,17 @@ border-radius:15px;</string>
                <cursorShape>PointingHandCursor</cursorShape>
               </property>
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(255, 255, 255);
-border-radius:5px;</string>
+               <string notr="true">QPushButton{
+background-color: rgb(46, 32, 58);
+border-radius: 10px;
+border:none;
+}
+QPushButton:hover{
+	background-color: rgb(57, 46, 69);
+}
+QPushButton:pressed{
+	background-color: rgb(112, 0, 132);
+}</string>
               </property>
               <property name="text">
                <string/>
@@ -1024,8 +1075,17 @@ border-radius:5px;</string>
                <cursorShape>PointingHandCursor</cursorShape>
               </property>
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(255, 255, 255);
-border-radius:5px;</string>
+               <string notr="true">QPushButton{
+background-color: rgb(46, 32, 58);
+border-radius: 10px;
+border:none;
+}
+QPushButton:hover{
+	background-color: rgb(57, 46, 69);
+}
+QPushButton:pressed{
+	background-color: rgb(112, 0, 132);
+}</string>
               </property>
               <property name="text">
                <string/>
@@ -1048,8 +1108,17 @@ border-radius:5px;</string>
                <cursorShape>PointingHandCursor</cursorShape>
               </property>
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(255, 255, 255);
-border-radius:5px;</string>
+               <string notr="true">QPushButton{
+background-color: rgb(46, 32, 58);
+border-radius: 10px;
+border:none;
+}
+QPushButton:hover{
+	background-color: rgb(57, 46, 69);
+}
+QPushButton:pressed{
+	background-color: rgb(112, 0, 132);
+}</string>
               </property>
               <property name="text">
                <string/>
@@ -1442,6 +1511,7 @@ border-radius:5px;</string>
        </property>
        <property name="font">
         <font>
+         <family>Segoe UI</family>
          <pointsize>11</pointsize>
          <weight>75</weight>
          <bold>true</bold>
@@ -1451,8 +1521,22 @@ border-radius:5px;</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 127);
-border-radius:15px;</string>
+        <string notr="true">QPushButton{
+background-color: rgb(46, 32, 58);
+border:none;
+border-radius: 15px;
+color: rgb(230, 230, 230);
+font-family: &quot;Segoe UI&quot;, sans-regular;
+font-weight: bold;
+}
+QPushButton:hover{
+	background-color: rgb(57, 46, 69);
+}
+QPushButton:pressed{
+	background-color: rgb(112, 0, 132);
+}
+
+</string>
        </property>
        <property name="text">
         <string>Song List</string>
@@ -1469,6 +1553,7 @@ border-radius:15px;</string>
        </property>
        <property name="font">
         <font>
+         <family>Segoe UI</family>
          <pointsize>11</pointsize>
          <weight>75</weight>
          <bold>true</bold>
@@ -1478,8 +1563,22 @@ border-radius:15px;</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(0, 255, 127);
-border-radius:15px;</string>
+        <string notr="true">QPushButton{
+background-color: rgb(46, 32, 58);
+border:none;
+border-radius: 15px;
+color: rgb(230, 230, 230);
+font-family: &quot;Segoe UI&quot;, sans-regular;
+font-weight: bold;
+}
+QPushButton:hover{
+	background-color: rgb(57, 46, 69);
+}
+QPushButton:pressed{
+	background-color: rgb(112, 0, 132);
+}
+
+</string>
        </property>
        <property name="text">
         <string>Playlists</string>
@@ -1496,6 +1595,7 @@ border-radius:15px;</string>
        </property>
        <property name="font">
         <font>
+         <family>Segoe UI</family>
          <pointsize>11</pointsize>
          <weight>75</weight>
          <bold>true</bold>
@@ -1505,8 +1605,22 @@ border-radius:15px;</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 140, 64);
-border-radius:15px;</string>
+        <string notr="true">QPushButton{
+background-color: rgb(46, 32, 58);
+border:none;
+border-radius: 15px;
+color: rgb(230, 230, 230);
+font-family: &quot;Segoe UI&quot;, sans-regular;
+font-weight: bold;
+}
+QPushButton:hover{
+	background-color: rgb(57, 46, 69);
+}
+QPushButton:pressed{
+	background-color: rgb(112, 0, 132);
+}
+
+</string>
        </property>
        <property name="text">
         <string>Favourites</string>
