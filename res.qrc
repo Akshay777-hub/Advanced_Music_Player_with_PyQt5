@@ -1,6 +1,5 @@
 <RCC>
   <qresource prefix="img">
-    <file>wallpaper.png</file>
     <file>utils/images/like.png</file>
     <file>utils/images/remove.png</file>
     <file>utils/images/about.png</file>

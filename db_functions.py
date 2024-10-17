@@ -1,120 +1,146 @@
-from supabase import create_client, Client
+import os
+import json
+from supabase import Client, create_client
+from supabase.lib.client_options import ClientOptions
 
-# Configure Supabase
-SUPABASE_URL = "https://mrxbxtuptrdmfgvdbofk.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yeGJ4dHVwdHJkbWZndmRib2ZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg5Mzc1OTQsImV4cCI6MjA0NDUxMzU5NH0.3v1kGzwEdV8CBql4kQ5iW4ep2cUDxdfdcKThEkuP3ew"
+url: str = "https://mrxbxtuptrdmfgvdbofk.supabase.co"
+key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yeGJ4dHVwdHJkbWZndmRib2ZrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODkzNzU5NCwiZXhwIjoyMDQ0NTEzNTk0fQ.NBHq2-TKoKCFHCLUXX9knYVexbN6urrL0EdKJxPrzZE"
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+options: ClientOptions = ClientOptions(headers={'Authorization': f'Bearer {key}'})
+supabase: Client = create_client(url, key)
 
-
-def create_playlist_table(table_name: str):
+def delete_playlist(playlist_name):
     try:
-        response = supabase.rpc("create_playlist_table", {"table_name": table_name}).execute()
-        if response.status_code != 200:
-            print("Error creating table:", response.json())
-            return False
-        return True
+        supabase.table('playlists').delete().eq('playlist_name', playlist_name).execute()
+        supabase.table('playlist_songs').delete().eq('playlist_name', playlist_name).execute() # Delete associated songs
+        print(f"Deleted playlist: {playlist_name}")
     except Exception as e:
-        print(f"Exception while creating table: {e}")
-        return False
+        print(f"Error deleting playlist: {e}")
 
-
-
-def add_song_to_playlist(song: str, playlist: str):
+def get_all_playlists():
     try:
-        response = supabase.table(playlist).insert({"song": song}).execute()
-        if response.status_code != 201:
-            print("Error adding song:", response.json())
-            return False  # Indicate failure
-        return True  # Indicate success
+        data = supabase.table('playlists').select('playlist_name').execute()
+        playlists = [item['playlist_name'] for item in data.data] if data.data else []
+        return playlists
+    except Exception as e:
+        print(f"Error getting playlists: {e}")
+        return []
+    
+
+# Add a song to a database table
+def add_song_to_database_table(song: str, table: str):
+    try:
+        data = supabase.table(table).insert({"song": song}).execute()
+        print(f"Inserted song: {song} into table: {table}")
+    except Exception as e:
+        print(f"Error inserting song: {e}")
+
+def add_song_to_playlist(playlist_name, song_path):
+    try:
+        data = {'playlist_name': playlist_name, 'song_path': song_path}
+        supabase.table('playlist_songs').insert(data).execute()
+        print(f"Added song {song_path} to playlist {playlist_name}")
+    except Exception as e:
+        print(f"Error adding song to playlist: {e}")
+
+
+# Delete a song from a database table
+def delete_song_from_database_table(song: str, table: str):
+    try:
+        data = (
+            supabase.table(table)
+            .delete()
+            .eq("song", song)
+            .execute()
+        )
+        print(f"Deleted song: {song} from table: {table}")
+    except Exception as e:
+        print(f"Error deleting song: {e}")
+
+
+
+# Delete all songs from a database table
+def delete_all_songs_from_database_table(table: str):
+    try:
+        data = supabase.table(table).delete().execute()
+        print(f"Deleted all songs from table: {table}")
 
     except Exception as e:
-        print(f"Exception while adding song: {e}")
-        return False  # Indicate failure
+        print(f"Error deleting all song: {e}")
 
 
-
-def delete_song_from_playlist(song: str, playlist: str):
+# Fetch all songs from a database table
+def fetch_all_songs_from_database_table(table: str):
     try:
-        response = supabase.table(playlist).delete().eq("song", song).execute()
-        if response.status_code != 200:
-            print("Error deleting song:", response.json())
-            return False
-        return True
+        data = supabase.table(table).select("song").execute()
+        songs = [item["song"] for item in data.data]
+        return songs
+
     except Exception as e:
-        print(f"Exception while deleting song: {e}")
-        return False
+        print(f"Error fetching songs: {e}")
 
-
-def delete_all_songs_from_playlist(playlist: str):
+def delete_playlist(playlist_name):
     try:
-        response = supabase.table(playlist).delete().neq("song", "").execute() # It might make more sense to delete everything, not check against empty song
-        if response.status_code != 200:
-            print("Error deleting all songs:", response.json())
-            return False
-        return True
+        supabase.table('playlists').delete().eq('playlist_name', playlist_name).execute()
+        supabase.table('playlist_songs').delete().eq('playlist_name', playlist_name).execute() # Delete associated songs
+        print(f"Deleted playlist: {playlist_name}")
     except Exception as e:
-        print(f"Exception while deleting all songs: {e}")
-        return False
+        print(f"Error deleting playlist: {e}")
 
 
-
-def fetch_all_songs_from_playlist(playlist: str):
+# Get all tables in the database
+def get_all_playlists():
     try:
-        response = supabase.table(playlist).select("*").execute()
-        if response.status_code == 200:
-            return [record["song"] for record in response.data]
+        data = supabase.table('playlists').select('playlist_name').execute()
+        playlists = [item['playlist_name'] for item in data.data] if data.data else []
+        return playlists
+    except Exception as e:
+        print(f"Error getting playlists: {e}")
+        return []
+    
+def get_playlist_songs(playlist_name):
+    try:
+        # Get playlist id
+        playlist_data = supabase.table('playlists').select('id').eq('playlist_name', playlist_name).execute()
+        playlist_id = playlist_data.data[0]['id'] if playlist_data.data else None
+
+        if playlist_id: # Check if playlist_id exists
+            # Get songs using playlist_id
+            data = supabase.table('playlist_songs').select('song_path').eq('playlist_id', playlist_id).execute()
+            songs = [item['song_path'] for item in data.data] if data.data else []
+            return songs
         else:
-            print("Error fetching songs:", response.json())
+            print(f"Playlist '{playlist_name}' not found.") # Handle the case where the playlist is not found
             return []
+
     except Exception as e:
-        print(f"Exception while fetching songs: {e}")
+        print(f"Error getting playlist songs: {e}")
+        return []
+
+    
+def get_all_schemas():
+    try:
+        response = supabase.postgrest.client().from_("information_schema.schemata").select("schema_name").execute()
+        schemas = [item["schema_name"] for item in response.data] if response.data else []
+        return schemas
+    except Exception as e:
+        print(f"Error getting schemas: {e}")
         return []
 
 
-
-def get_playlist_tables():
+# Delete a database table
+def delete_database_table(table: str):
     try:
-        response = supabase.rpc("get_playlist_tables").execute()
-        if response.status_code == 200:
-            return response.data
-        else:
-            print("Error getting playlist tables:", response.json())
-            return []
+        supabase.table(table).delete().execute()
     except Exception as e:
-        print(f"Exception while getting playlist tables: {e}")
-        return []
+        print(f"Error deleting table: {e}")
 
-
-def delete_playlist_table(table: str):
+def create_playlist(playlist_name, user_id=None):  # Add user_id if needed
     try:
-        response = supabase.rpc("drop_table", {"table_name": table}).execute()
-        if response.status_code != 200:
-            print("Error deleting table:", response.json())
-            return False  # Indicate failure
-        return True  # Indicate Success
-
+        data = {'playlist_name': playlist_name}
+        if user_id:
+            data['user_id'] = user_id
+        supabase.table('playlists').insert(data).execute()
+        print(f"Created playlist: {playlist_name}")
     except Exception as e:
-        print(f"Exception while deleting table: {e}")
-        return False
-
-
-
-def add_song_to_favourites(song: str):
-    return add_song_to_playlist(song, "favourites")
-
-
-
-def delete_song_from_favourites(song: str):
-    return delete_song_from_playlist(song, 'favourites')
-
-def delete_all_songs_from_favourites():
-    return delete_all_songs_from_playlist('favourites')
-
-def fetch_all_songs_from_favourites():
-    return fetch_all_songs_from_playlist("favourites")
-
-
-
-def clear_currently_playing(listWidget): # Helper function - new addition
-    listWidget.clear()
+        print(f"Error creating playlist: {e}")
