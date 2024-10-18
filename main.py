@@ -28,7 +28,6 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
         # Remove default title bar
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.FramelessWindowHint)
-
         # Globals
         global stopped
         global looped
@@ -51,7 +50,8 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
         self.load_playlists()
 
         # Create Player
-        self.player = QMediaPlayer()
+        self.player = QMediaPlayer() # Initialize the player object before connecting signals
+        self.player.durationChanged.connect(self.set_slider_range) # Connect after defining the method
 
         self.initial_volume = 20
         self.player.setVolume(self.initial_volume)
@@ -146,6 +146,9 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
 
         self.title_frame.mouseMoveEvent = moveApp
 
+    def set_slider_range(self, duration):  # Correct indentation: at the same level as __init__
+        self.music_slider.setRange(0, duration)
+    
     # Function to handle mouse position
     def mousePressEvent(self, event):
         self.initialPosition = event.globalPos()
