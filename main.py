@@ -727,15 +727,24 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
             print(f"Loading songs from playlist: {playlist}: {e}")
 
     # Show Playlist Content
-    def show_playlist_content(self):
+    def show_playlist_content(self, item):
         try:
-            playlist_name = self.playlists_listWidget.currentItem().text() # Get playlist name
-            songs_in_playlist = get_playlist_songs(playlist_name)  # Get songs from db_functions
+            playlist_name = item.text()
+            songs_in_playlist = get_playlist_songs(playlist_name)  # Pass user_uuid
             song_names = [os.path.basename(song) for song in songs_in_playlist]
+
+            if not song_names:  # Check if the playlist is empty
+                QMessageBox.information(self, f"Playlist '{playlist_name}'", "This playlist is empty.")
+                return
+
             playlist_dialog = PlaylistDialog(song_names, playlist_name)
             playlist_dialog.exec_()
+
         except Exception as e:
-            print(f"Showing Playlist Content error: {e}")
+            print(f"Error showing playlist content: {e}")
+
+            # ... Connect the double-clicked signal to the modified function
+        self.playlists_listWidget.itemDoubleClicked.connect(self.show_playlist_content)
 
     # CONTEXT MENUS
     # Playlist Contex Menu

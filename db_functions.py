@@ -43,8 +43,7 @@ def add_song_to_playlist(playlist_name, song_path):
         print(f"Added song {song_path} to playlist {playlist_name}")
     except Exception as e:
         print(f"Error adding song to playlist: {e}")
-
-
+        
 # Delete a song from a database table
 def delete_song_from_database_table(song: str, table: str):
     try:
@@ -105,9 +104,9 @@ def get_playlist_songs(playlist_name):
         playlist_data = supabase.table('playlists').select('id').eq('playlist_name', playlist_name).execute()
         playlist_id = playlist_data.data[0]['id'] if playlist_data.data else None
 
-        if playlist_id: # Check if playlist_id exists
+        if playlist_name: # Check if playlist_id exists
             # Get songs using playlist_id
-            data = supabase.table('playlist_songs').select('song_path').eq('playlist_id', playlist_id).execute()
+            data = supabase.table('playlist_songs').select('song_path').eq('playlist_name', playlist_name).execute()
             songs = [item['song_path'] for item in data.data] if data.data else []
             return songs
         else:
