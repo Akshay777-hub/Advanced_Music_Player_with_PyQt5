@@ -28,9 +28,10 @@ def get_all_playlists():
     
 
 # Add a song to a database table
-def add_song_to_database_table(song: str, table: str):
+def add_song_to_database_table(song: str, table: str, uuid: str):
     try:
-        data = supabase.table(table).insert({"song": song}).execute()
+        data = {"song": song, "user_uuid": uuid}
+        supabase.table(table).insert(data).execute()
         print(f"Inserted song: {song} into table: {table}")
     except Exception as e:
         print(f"Error inserting song: {e}")
@@ -135,11 +136,9 @@ def delete_database_table(table: str):
     except Exception as e:
         print(f"Error deleting table: {e}")
 
-def create_playlist(playlist_name, user_id=None):  # Add user_id if needed
+def create_playlist(playlist_name, user_uuid):  # Add user_id if needed
     try:
-        data = {'playlist_name': playlist_name}
-        if user_id:
-            data['user_id'] = user_id
+        data = {'playlist_name': playlist_name, 'user_uuid':user_uuid}
         supabase.table('playlists').insert(data).execute()
         print(f"Created playlist: {playlist_name}")
     except Exception as e:

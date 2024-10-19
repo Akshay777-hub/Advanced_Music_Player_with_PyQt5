@@ -20,8 +20,9 @@ from PyQt5.QtCore import Qt, QUrl, QTimer
 from playlist_popup import PlaylistDialog
 
 class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
-    def __init__(self):
+    def __init__(self, user_uuid):
         super().__init__()
+        self.user_uuid = user_uuid
         self.window = QMainWindow()
         self.setupUi(self)
 
@@ -488,7 +489,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
             )
             return
         for song in songs.current_song_list:
-            add_song_to_database_table(song, 'favourites')
+            add_song_to_database_table(song, 'favourites', self.user_uuid)
         self.load_favourites_into_app()
 
     # Add song to favourites
@@ -502,7 +503,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
             return
         try:
             song = songs.current_song_list[current_index]
-            add_song_to_database_table(song=f"{song}", table='favourites')
+            add_song_to_database_table(song=f"{song}", table='favourites',uuid= self.user_uuid)
             # QMessageBox.information(
             #     self, 'Add Songs to Favourites',
             #     f'{os.path.basename(song)} was successfully added to favourites'
@@ -596,7 +597,7 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
                 else:  # User cancelled (QMessageBox.Cancel)
                     return  # Exit the function
 
-            create_playlist(name)  # Create the new playlist (only if it's new or replaced)
+            create_playlist(name, self.user_uuid)  # Create the new playlist (only if it's new or replaced)
             self.load_playlists()  # Refresh playlist display
 
         except Exception as e:
@@ -616,7 +617,10 @@ class ModernMusicPlayer(QMainWindow, Ui_MusicApp):
     # Delete all playlists
     def delete_all_playlists(self):
         playlists = get_all_playlists()
-        playlists.remove('favourites')
+        if 'favourites' in playlists:  # Check if 'favourites' is present
+            playlists.remove('favourites')  # Remove only if it's in the list
+
+        # ... rest of your method (confirmation dialog and deletion logic)
 
         caution = QMessageBox.question(
             self, 'Delete all playlists',
